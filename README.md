@@ -16,3 +16,5 @@ Include the following files in the following order:
 [Link to jQuery](http://jquery.com/)
 
 [Link to Knockout.js](http://knockoutjs.com/)
+
+[Link to Animate.css](http://daneden.me/animate/)
