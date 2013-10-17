@@ -4,7 +4,7 @@
 Setup
 -----
 
-Include the following javascript files in the following order:
+Include the following files in the following order:
 
 ``` html
 <link rel="stylesheet" href="animate.css" />
@@ -14,4 +14,5 @@ Include the following javascript files in the following order:
 ```
 
 [Link to jQuery](http://jquery.com/)
+
 [Link to Knockout.js](http://knockoutjs.com/)
