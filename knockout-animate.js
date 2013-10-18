@@ -138,10 +138,14 @@ koAnimate.helpers =
     }
 };
 
+//#endregion "Helpers"
+
+//#region "Animations"
+
 koAnimate.animations =
 {
     animationEnd: 'animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd',
-    setDuration: function(element, duration)
+    setDuration: function (element, duration)
     {
         //Overrides the Animate.css animated class
 
@@ -157,16 +161,16 @@ koAnimate.animations =
         $('html > head').append(style);
     },
 
-    removeDuration: function(element)
+    removeDuration: function (element)
     {
-        $.each(koAnimate.helpers.cssVendors, function(index, item)
+        $.each(koAnimate.helpers.cssVendors, function (index, item)
         {
             $(element).removeAttr(item + 'transition-duration', '');
             $(element).removeAttr(item + 'animation-fill-mode', '');
         });
     },
 
-    stopAnimation: function(element)
+    stopAnimation: function (element)
     {
         $(element).css('-moz-transition', 'none');
         $(element).css('-webkit-transition', 'none');
@@ -174,34 +178,34 @@ koAnimate.animations =
         $(element).css('transition', 'none');
     },
 
-    scale: function(element, scale, duration)
+    scale: function (element, scale, duration)
     {
         var seconds = duration / 1000;
-        $.each(koAnimate.helpers.cssVendors, function(index, item)
+        $.each(koAnimate.helpers.cssVendors, function (index, item)
         {
             $(element).css(item + 'transform', 'scale(' + scale + ')').css(item + 'transition', seconds + 's ease');
         });
     },
 
-    rotate: function(element, degrees, duration)
+    rotate: function (element, degrees, duration)
     {
         var seconds = duration / 1000;
-        $.each(koAnimate.helpers.cssVendors, function(index, item)
+        $.each(koAnimate.helpers.cssVendors, function (index, item)
         {
             $(element).css(item + 'transform', 'rotate(' + degrees + 'deg)').css(item + 'transition', seconds + 's ease');
         });
     },
 
-    opacity: function(element, opacity, duration)
+    opacity: function (element, opacity, duration)
     {
         var seconds = duration / 1000;
-        $.each(koAnimate.helpers.cssVendors, function(index, item)
+        $.each(koAnimate.helpers.cssVendors, function (index, item)
         {
             $(element).css("opacity", opacity).css(item + 'transition', 'opacity ' + seconds + 's ease');
         });
     },
-    
-    slide: function(element, pixelsX, pixelsY, duration)
+
+    slide: function (element, pixelsX, pixelsY, duration)
     {
         var seconds = duration / 1000;
         $.each(koAnimate.helpers.cssVendors, function (index, item)
@@ -211,7 +215,7 @@ koAnimate.animations =
     }
 };
 
-//#endregion "Helpers"
+//#endregion "Animations"
 
 //#region "Hovering"
 
