@@ -80,7 +80,7 @@ koAnimate.helpers =
     {
         if (isObservable)
         {
-            return typeof json()[property] != "undefined" ? json()[property] : json;
+            return typeof json()[property] != "undefined" ? json()[property] : json();
         }
         
         if (!json())
@@ -145,6 +145,9 @@ koAnimate.helpers =
 koAnimate.animations =
 {
     animationEnd: 'animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd',
+    
+    transitionEnd: 'transitionend webkitTransitionEnd oTransitionEnd otransitionend',
+    
     setDuration: function (element, duration)
     {
         //Overrides the Animate.css animated class
@@ -165,8 +168,8 @@ koAnimate.animations =
     {
         $.each(koAnimate.helpers.cssVendors, function (index, item)
         {
-            $(element).removeAttr(item + 'transition-duration', '');
-            $(element).removeAttr(item + 'animation-fill-mode', '');
+            $(element).css(item + 'transition-duration', '');
+            $(element).css(item + 'animation-fill-mode', '');
         });
     },
 
@@ -274,13 +277,15 @@ ko.bindingHandlers.fadeVisible =
     {
         var observable = koAnimate.helpers.getValue(json, "observable", null, null, true);
 
-        if (ko.utils.unwrapObservable((typeof (observable) == "function") ? observable() : observable))
+        if (ko.utils.unwrapObservable(observable))
         {
             $(element).show();
         }
         else
         {
             $(element).hide();
+            
+            //Set initial opacity
             koAnimate.animations.opacity(element, 0, 0);
         }
     },
@@ -290,26 +295,34 @@ ko.bindingHandlers.fadeVisible =
         var duration = koAnimate.helpers.getValue(json, "duration", koAnimate.defaults.fadeVisible.duration, true);
         var durationOut = koAnimate.helpers.getValue(json, "durationOut", koAnimate.defaults.fadeVisible.durationOut, true);
         
-        clearTimeout(element.koAnimateFadeVisible);
+        $(element).off(koAnimate.animations.transitionEnd);
         
-        if (ko.utils.unwrapObservable((typeof (observable) == "function") ? observable() : observable))
+        if (ko.utils.unwrapObservable(observable))
         {
             $(element).show();
+            
             element.koAnimateFadeVisible = setTimeout(function()
             {
                 koAnimate.animations.opacity(element, 1, duration);
+                
+                $(element).on(koAnimate.animations.transitionEnd, function ()
+                {
+                    $(element).show();
+                });
+                
             }, 50);
 
         }
         else
         {
             $(element).show();
+            
             koAnimate.animations.opacity(element, 0, durationOut);
             
-            element.koAnimateFadeVisible = setTimeout(function ()
+            $(element).on(koAnimate.animations.transitionEnd, function ()
             {
                 $(element).hide();
-            }, durationOut);
+            });
         }
     }
 };
@@ -319,7 +332,7 @@ ko.bindingHandlers.scaleVisible =
     init: function (element, json)
     {
         var observable = koAnimate.helpers.getValue(json, "observable", null, null, true);
-        if (ko.utils.unwrapObservable((typeof (observable) == "function") ? observable() : observable))
+        if (ko.utils.unwrapObservable(observable))
         {
             $(element).show();
         }
@@ -337,21 +350,25 @@ ko.bindingHandlers.scaleVisible =
         var scale = koAnimate.helpers.getValue(json, "scale", koAnimate.defaults.scaleVisible.scale, true);
         var scaleHide = koAnimate.helpers.getValue(json, "scaleHide", koAnimate.defaults.scaleVisible.scaleHide, true);
         var scaleHideOut = koAnimate.helpers.getValue(json, "scaleHideOut", koAnimate.defaults.scaleVisible.scaleHideOut, true);
-        
-        clearTimeout(element.koAnimateScaleVisible);
-        
-        if (ko.utils.unwrapObservable((typeof (observable) == "function") ? observable() : observable))
+
+        $(element).off(koAnimate.animations.transitionEnd);
+
+        if (ko.utils.unwrapObservable(observable))
         {
             koAnimate.animations.scale(element, scaleHide, 0);
             $(element).show();
+            koAnimate.animations.stopAnimation(element);
+            
             setTimeout(function()
             {
+                
                 koAnimate.animations.scale(element, scale, duration);
                 
-                element.koAnimateScaleVisible = setTimeout(function ()
+                $(element).on(koAnimate.animations.transitionEnd, function ()
                 {
                     $(element).show();
-                }, duration);
+                });
+
                 
             }, 50);
         }
@@ -359,10 +376,10 @@ ko.bindingHandlers.scaleVisible =
         {
             koAnimate.animations.scale(element, scaleHideOut, durationOut);
             
-            element.koAnimateScaleVisible = setTimeout(function ()
+            $(element).on(koAnimate.animations.transitionEnd, function ()
             {
                 $(element).hide();
-            }, durationOut);
+            });
         }
 
     }
@@ -375,7 +392,7 @@ ko.bindingHandlers.slideVisible =
         var observable = koAnimate.helpers.getValue(json, "observable", null, false, true);
         var directionOut = koAnimate.helpers.getValue(json, "directionOut", koAnimate.defaults.slideVisible.directionOut, true);
 
-        if (ko.utils.unwrapObservable((typeof (observable) == "function") ? observable() : observable))
+        if (ko.utils.unwrapObservable(observable))
         {
             $(element).show();
         }
@@ -392,14 +409,15 @@ ko.bindingHandlers.slideVisible =
         var durationOut = koAnimate.helpers.getValue(json, "durationOut", koAnimate.defaults.slideVisible.durationOut, true);
         var directionOut = koAnimate.helpers.getValue(json, "directionOut", koAnimate.defaults.slideVisible.directionOut, true);
 
-        clearTimeout(element.koAnimateSlideVisible);
+        $(element).off(koAnimate.animations.transitionEnd);
         
         setTimeout(function()
         {
-            if (ko.utils.unwrapObservable((typeof (observable) == "function") ? observable() : observable))
+            if (ko.utils.unwrapObservable(observable))
             {
                 $(element).show();
-                element.koAnimateSlideVisible = setTimeout(function ()
+                
+                setTimeout(function ()
                 {
                     koAnimate.animations.slide(element, '0px', '0px', duration);
                 }, 50);
@@ -409,10 +427,11 @@ ko.bindingHandlers.slideVisible =
                 setTimeout(function ()
                 {
                     koAnimate.animations.slide(element, koAnimate.helpers.getDirectionX(directionOut), koAnimate.helpers.getDirectionY(directionOut), durationOut);
-                    element.koAnimateSlideVisible = element.koAnimateAnimation = setTimeout(function ()
+                    
+                    $(element).on(koAnimate.animations.transitionEnd, function ()
                     {
                         $(element).hide();
-                    }, durationOut);
+                    });
 
                 }, 50);
 
@@ -466,8 +485,7 @@ ko.bindingHandlers.cssAnimateVisible =
     init: function (element, json)
     {
         var observable = koAnimate.helpers.getValue(json, "observable", null, false, true);
-        var animationOut = koAnimate.helpers.getValue(json, "animationOut", koAnimate.defaults.cssAnimateVisible.animationOut, false);
-        if (ko.utils.unwrapObservable((typeof (observable) == "function") ? observable() : observable))
+        if (ko.utils.unwrapObservable(observable))
         {
             $(element).show();
         }
