@@ -302,6 +302,7 @@ ko.bindingHandlers.fadeVisible =
         var easingOut = koAnimate.helpers.getValue(json, "easingOut", koAnimate.defaults.fadeVisible.easingOut, true);
         
         $(element).off(koAnimate.animations.transitionEnd);
+        clearTimeout(element.koAnimateFadeVisible);
         
         if (ko.utils.unwrapObservable(observable))
         {
@@ -360,14 +361,15 @@ ko.bindingHandlers.scaleVisible =
         var easingOut = koAnimate.helpers.getValue(json, "easingOut", koAnimate.defaults.scaleVisible.easingOut, true);
 
         $(element).off(koAnimate.animations.transitionEnd);
-
+        clearTimeout(element.koAnimateScaleVisible);
+        
         if (ko.utils.unwrapObservable(observable))
         {
             koAnimate.animations.scale(element, scaleHide, 0);
             $(element).show();
             koAnimate.animations.stopAnimation(element);
             
-            setTimeout(function()
+           element.koAnimateScaleVisible = setTimeout(function()
             {
                 
                 koAnimate.animations.scale(element, scale, duration, easing);
@@ -420,21 +422,23 @@ ko.bindingHandlers.slideVisible =
         var easingOut = koAnimate.helpers.getValue(json, "easingOut", koAnimate.defaults.slideVisible.easingOut, true);
 
         $(element).off(koAnimate.animations.transitionEnd);
+        clearTimeout(element.koAnimateSlideVisible);
+        clearTimeout(element.koAnimateSlideVisible2);
         
-        setTimeout(function()
+        element.koAnimateSlideVisible = setTimeout(function ()
         {
             if (ko.utils.unwrapObservable(observable))
             {
                 $(element).show();
                 
-                setTimeout(function ()
+                element.koAnimateSlideVisible2 = setTimeout(function ()
                 {
                     koAnimate.animations.slide(element, '0px', '0px', duration, easing);
                 }, 50);
             }
             else
             {
-                setTimeout(function ()
+                element.koAnimateSlideVisible2 = setTimeout(function ()
                 {
                     koAnimate.animations.slide(element, koAnimate.helpers.getDirectionX(directionOut), koAnimate.helpers.getDirectionY(directionOut), durationOut, easingOut);
                     
