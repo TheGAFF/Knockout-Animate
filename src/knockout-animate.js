@@ -7,7 +7,6 @@ var koAnimate =
     {
         hoverScale:
         {
-            scale: 1.2,
             duration: 250,
             scaleOut: 1.0,
             durationOut: 100,
@@ -225,14 +224,14 @@ koAnimate.animations =
 
 ko.bindingHandlers.hoverScale =
 {
-    update: function (element, json)
+    init: function (element, valueAccessor, allBindings)
     {
-        var scale = koAnimate.helpers.getValue(json, "scale", koAnimate.defaults.hoverScale.scale, false);
-        var duration = koAnimate.helpers.getValue(json, "duration", koAnimate.defaults.hoverScale.duration, true);
-        var scaleOut = koAnimate.helpers.getValue(json, "scaleOut", koAnimate.defaults.hoverScale.scaleOut, true);
-        var durationOut = koAnimate.helpers.getValue(json, "durationOut", koAnimate.defaults.hoverScale.durationOut, true);
-        var easing = koAnimate.helpers.getValue(json, "easing", koAnimate.defaults.hoverScale.easing, true);
-        var easingOut = koAnimate.helpers.getValue(json, "easingOut", koAnimate.defaults.hoverScale.easingOut, true);
+        var duration = allBindings['has']('duration') ? allBindings.get('duration') : koAnimate.defaults.hoverScale.duration;
+        var durationOut = allBindings['has']('durationOut') ? allBindings.get('durationOut') : koAnimate.defaults.hoverScale.durationOut;
+        var easing = allBindings['has']('easing') ? allBindings.get('easing') : koAnimate.defaults.hoverScale.easing;
+        var easingOut = allBindings['has']('easingOut') ? allBindings.get('easingOut') : koAnimate.defaults.hoverScale.easingOut;
+        var scale = valueAccessor();
+        var scaleOut = allBindings['has']('scaleOut') ? allBindings.get('scaleOut') : koAnimate.defaults.hoverScale.scaleOut;
 
         ko.utils.registerEventHandler(element, "mouseenter", function ()
         {
@@ -249,14 +248,14 @@ ko.bindingHandlers.hoverScale =
 
 ko.bindingHandlers.hoverRotate =
 {
-    update: function (element, json)
+    init: function (element, valueAccessor, allBindings)
     {
-        var degrees = koAnimate.helpers.getValue(json, "degrees", koAnimate.defaults.hoverRotate.degrees, false);
-        var duration = koAnimate.helpers.getValue(json, "duration", koAnimate.defaults.hoverRotate.duration, true);
-        var degreesOut = koAnimate.helpers.getValue(json, "degreesOut", koAnimate.defaults.hoverRotate.degreesOut, true);
-        var durationOut = koAnimate.helpers.getValue(json, "durationOut", koAnimate.defaults.hoverRotate.durationOut, true);
-        var easing = koAnimate.helpers.getValue(json, "easing", koAnimate.defaults.hoverRotate.easing, true);
-        var easingOut = koAnimate.helpers.getValue(json, "easingOut", koAnimate.defaults.hoverRotate.easingOut, true);
+        var degrees = valueAccessor();
+        var degreesOut = allBindings['has']('degreesOut') ? allBindings.get('degreesOut') : koAnimate.defaults.hoverRotate.degreesOut;
+        var duration = allBindings['has']('duration') ? allBindings.get('duration') : koAnimate.defaults.hoverRotate.duration;
+        var durationOut = allBindings['has']('durationOut') ? allBindings.get('durationOut') : koAnimate.defaults.hoverRotate.durationOut;
+        var easing = allBindings['has']('easing') ? allBindings.get('easing') : koAnimate.defaults.hoverRotate.easing;
+        var easingOut = allBindings['has']('easingOut') ? allBindings.get('easingOut') : koAnimate.defaults.hoverRotate.easingOut;
 
         ko.utils.registerEventHandler(element, "mouseenter", function ()
         {
@@ -277,11 +276,9 @@ ko.bindingHandlers.hoverRotate =
 
 ko.bindingHandlers.fadeVisible =
 {
-    init: function (element, json)
+    init: function (element, valueAccessor)
     {
-        var observable = koAnimate.helpers.getValue(json, "observable", null, null, true);
-        
-        if (ko.utils.unwrapObservable(observable))
+        if (ko.utils.unwrapObservable(valueAccessor()))
         {
             $(element).show();
         }
@@ -293,18 +290,17 @@ ko.bindingHandlers.fadeVisible =
             koAnimate.animations.opacity(element, 0, 0, 'ease');
         }
     },
-    update: function (element, json)
+    update: function (element, valueAccessor, allBindings)
     {
-        var observable = koAnimate.helpers.getValue(json, "observable", null, null, true);
-        var duration = koAnimate.helpers.getValue(json, "duration", koAnimate.defaults.fadeVisible.duration, true);
-        var durationOut = koAnimate.helpers.getValue(json, "durationOut", koAnimate.defaults.fadeVisible.durationOut, true);
-        var easing = koAnimate.helpers.getValue(json, "easing", koAnimate.defaults.fadeVisible.easing, true);
-        var easingOut = koAnimate.helpers.getValue(json, "easingOut", koAnimate.defaults.fadeVisible.easingOut, true);
+        var duration = allBindings['has']('duration') ? allBindings.get('duration') : koAnimate.defaults.fadeVisible.duration;
+        var durationOut = allBindings['has']('durationOut') ? allBindings.get('durationOut') : koAnimate.defaults.fadeVisible.durationOut;
+        var easing = allBindings['has']('easing') ? allBindings.get('easing') : koAnimate.defaults.fadeVisible.easing;
+        var easingOut = allBindings['has']('easingOut') ? allBindings.get('easingOut') : koAnimate.defaults.fadeVisible.easingOut;
         
         $(element).off(koAnimate.animations.transitionEnd);
         clearTimeout(element.koAnimateFadeVisible);
         
-        if (ko.utils.unwrapObservable(observable))
+        if (ko.utils.unwrapObservable(valueAccessor()))
         {
             $(element).show();
             
@@ -336,10 +332,9 @@ ko.bindingHandlers.fadeVisible =
 
 ko.bindingHandlers.scaleVisible =
 {
-    init: function (element, json)
+    init: function (element, valueAccessor)
     {
-        var observable = koAnimate.helpers.getValue(json, "observable", null, null, true);
-        if (ko.utils.unwrapObservable(observable))
+        if (ko.utils.unwrapObservable(valueAccessor()))
         {
             $(element).show();
         }
@@ -349,43 +344,42 @@ ko.bindingHandlers.scaleVisible =
         }
 
     },
-    update: function (element, json)
+    update: function (element, valueAccessor, allBindings)
     {
-        var observable = koAnimate.helpers.getValue(json, "observable", null, null, true);
-        var duration = koAnimate.helpers.getValue(json, "duration", koAnimate.defaults.scaleVisible.duration, true);
-        var durationOut = koAnimate.helpers.getValue(json, "durationOut", koAnimate.defaults.scaleVisible.durationOut, true);
-        var scale = koAnimate.helpers.getValue(json, "scale", koAnimate.defaults.scaleVisible.scale, true);
-        var scaleHide = koAnimate.helpers.getValue(json, "scaleHide", koAnimate.defaults.scaleVisible.scaleHide, true);
-        var scaleHideOut = koAnimate.helpers.getValue(json, "scaleHideOut", koAnimate.defaults.scaleVisible.scaleHideOut, true);
-        var easing = koAnimate.helpers.getValue(json, "easing", koAnimate.defaults.scaleVisible.easing, true);
-        var easingOut = koAnimate.helpers.getValue(json, "easingOut", koAnimate.defaults.scaleVisible.easingOut, true);
+        var duration = allBindings['has']('duration') ? allBindings.get('duration') : koAnimate.defaults.scaleVisible.duration;
+        var durationOut = allBindings['has']('durationOut') ? allBindings.get('durationOut') : koAnimate.defaults.scaleVisible.durationOut;
+        var easing = allBindings['has']('easing') ? allBindings.get('easing') : koAnimate.defaults.scaleVisible.easing;
+        var easingOut = allBindings['has']('easingOut') ? allBindings.get('easingOut') : koAnimate.defaults.scaleVisible.easingOut;
+        var scale = allBindings['has']('scale') ? allBindings.get('scale') : koAnimate.defaults.scaleVisible.scale;
+        var scaleHide = allBindings['has']('scaleHide') ? allBindings.get('scaleHide') : koAnimate.defaults.scaleVisible.scaleHide;
+        var scaleHideOut = allBindings['has']('scaleHideOut') ? allBindings.get('scaleHideOut') : koAnimate.defaults.scaleVisible.scaleHideOut;
 
         $(element).off(koAnimate.animations.transitionEnd);
         clearTimeout(element.koAnimateScaleVisible);
-        
-        if (ko.utils.unwrapObservable(observable))
+
+        if (ko.utils.unwrapObservable(valueAccessor()))
         {
             koAnimate.animations.scale(element, scaleHide, 0);
             $(element).show();
             koAnimate.animations.stopAnimation(element);
-            
-           element.koAnimateScaleVisible = setTimeout(function()
+
+            element.koAnimateScaleVisible = setTimeout(function ()
             {
-                
+
                 koAnimate.animations.scale(element, scale, duration, easing);
-                
+
                 $(element).on(koAnimate.animations.transitionEnd, function ()
                 {
                     $(element).show();
                 });
 
-                
+
             }, 50);
         }
         else
         {
             koAnimate.animations.scale(element, scaleHideOut, durationOut, easingOut);
-            
+
             $(element).on(koAnimate.animations.transitionEnd, function ()
             {
                 $(element).hide();
@@ -397,40 +391,37 @@ ko.bindingHandlers.scaleVisible =
 
 ko.bindingHandlers.slideVisible =
 {
-    init: function (element, json)
+    init: function (element, valueAccessor, allBindings)
     {
-        var observable = koAnimate.helpers.getValue(json, "observable", null, false, true);
-        var directionOut = koAnimate.helpers.getValue(json, "directionOut", koAnimate.defaults.slideVisible.directionOut, true);
-
-        if (ko.utils.unwrapObservable(observable))
+        if (ko.utils.unwrapObservable(valueAccessor()))
         {
             $(element).show();
         }
         else
         {
             $(element).hide();
-            koAnimate.animations.slide(element, koAnimate.helpers.getDirectionX(directionOut), 0, 'ease');
         }
     },
-    update: function (element, json)
+    update: function (element, valueAccessor, allBindings)
     {
-        var observable = koAnimate.helpers.getValue(json, "observable", null, null, true);
-        var duration = koAnimate.helpers.getValue(json, "duration", koAnimate.defaults.slideVisible.duration, true);
-        var durationOut = koAnimate.helpers.getValue(json, "durationOut", koAnimate.defaults.slideVisible.durationOut, true);
-        var directionOut = koAnimate.helpers.getValue(json, "directionOut", koAnimate.defaults.slideVisible.directionOut, true);
-        var easing = koAnimate.helpers.getValue(json, "easing", koAnimate.defaults.slideVisible.easing, true);
-        var easingOut = koAnimate.helpers.getValue(json, "easingOut", koAnimate.defaults.slideVisible.easingOut, true);
+        var value = ko.utils.unwrapObservable(valueAccessor());
+        
+        var duration = allBindings['has']('duration') ? allBindings.get('duration') : koAnimate.defaults.slideVisible.duration;
+        var durationOut = allBindings['has']('durationOut') ? allBindings.get('durationOut') : koAnimate.defaults.slideVisible.durationOut;
+        var easing = allBindings['has']('easing') ? allBindings.get('easing') : koAnimate.defaults.slideVisible.easing;
+        var easingOut = allBindings['has']('easingOut') ? allBindings.get('easingOut') : koAnimate.defaults.slideVisible.easingOut;
+        var directionOut = allBindings['has']('directionOut') ? allBindings.get('directionOut') : koAnimate.defaults.slideVisible.directionOut;
 
         $(element).off(koAnimate.animations.transitionEnd);
         clearTimeout(element.koAnimateSlideVisible);
         clearTimeout(element.koAnimateSlideVisible2);
-        
+
         element.koAnimateSlideVisible = setTimeout(function ()
         {
-            if (ko.utils.unwrapObservable(observable))
+            if (value)
             {
                 $(element).show();
-                
+
                 element.koAnimateSlideVisible2 = setTimeout(function ()
                 {
                     koAnimate.animations.slide(element, '0px', '0px', duration, easing);
@@ -441,7 +432,7 @@ ko.bindingHandlers.slideVisible =
                 element.koAnimateSlideVisible2 = setTimeout(function ()
                 {
                     koAnimate.animations.slide(element, koAnimate.helpers.getDirectionX(directionOut), koAnimate.helpers.getDirectionY(directionOut), durationOut, easingOut);
-                    
+
                     $(element).on(koAnimate.animations.transitionEnd, function ()
                     {
                         $(element).hide();
@@ -452,7 +443,7 @@ ko.bindingHandlers.slideVisible =
             }
 
         }, 50);
-      
+
     }
 };
 
@@ -462,13 +453,13 @@ ko.bindingHandlers.slideVisible =
 
 ko.bindingHandlers.cssAnimate =
 {
-    init: function (element, json)
+    init: function (element, valueAccessor, allBindings)
     {
-        var animation = koAnimate.helpers.getValue(json, "animation", koAnimate.defaults.cssAnimate.animation, false);
-        var event = koAnimate.helpers.getValue(json, "event", koAnimate.defaults.cssAnimate.event, true);
-        var duration = koAnimate.helpers.getValue(json, "duration", koAnimate.defaults.cssAnimate.duration, true);
-        var callback = koAnimate.helpers.getValue(json, "callback", koAnimate.defaults.cssAnimate.callback, true);
-
+        var event = allBindings['has']('event') ? allBindings.get('event') : koAnimate.defaults.cssAnimate.event;
+        var callback = allBindings['has']('callback') ? allBindings.get('callback') : koAnimate.defaults.cssAnimate.callback;
+        var duration = allBindings['has']('duration') ? allBindings.get('duration') : koAnimate.defaults.cssAnimate.duration;
+        var animation = valueAccessor();
+        
         ko.utils.registerEventHandler(element, event, function ()
         {
 
@@ -496,10 +487,10 @@ ko.bindingHandlers.cssAnimate =
 
 ko.bindingHandlers.cssAnimateVisible =
 {
-    init: function (element, json)
+    init: function (element, valueAccessor, allBindings)
     {
-        var observable = koAnimate.helpers.getValue(json, "observable", null, false, true);
-        if (ko.utils.unwrapObservable(observable))
+        var value = ko.utils.unwrapObservable(valueAccessor());
+        if (value)
         {
             $(element).show();
         }
@@ -509,21 +500,20 @@ ko.bindingHandlers.cssAnimateVisible =
         }
     },
 
-    update: function (element, json)
+    update: function (element, valueAccessor, allBindings)
     {
-        var observable = koAnimate.helpers.getValue(json, "observable", null, false, true);
-        var animation = koAnimate.helpers.getValue(json, "animation", koAnimate.defaults.cssAnimateVisible.animation, false);
-        var animationOut = koAnimate.helpers.getValue(json, "animationOut", koAnimate.defaults.cssAnimateVisible.animationOut, false);
-        var duration = koAnimate.helpers.getValue(json, "duration", koAnimate.defaults.cssAnimateVisible.duration, false);
-        var durationOut = koAnimate.helpers.getValue(json, "durationOut", koAnimate.defaults.cssAnimateVisible.durationOut, false);
-
+        var duration = allBindings['has']('duration') ? allBindings.get('duration') : koAnimate.defaults.cssAnimateVisible.duration;
+        var durationOut = allBindings['has']('durationOut') ? allBindings.get('durationOut') : koAnimate.defaults.cssAnimateVisible.durationOut;
+        var animation = allBindings['has']('animation') ? allBindings.get('animation') : koAnimate.defaults.cssAnimateVisible.animation;
+        var animationOut = allBindings['has']('animationOut') ? allBindings.get('animationOut') : koAnimate.defaults.cssAnimateVisible.animationOut;
+        var value = ko.utils.unwrapObservable(valueAccessor());
         $(element).unbind(koAnimate.animations.animationEnd);
         $(element).removeClass(animation);
         $(element).removeClass(animationOut);
         
         setTimeout(function()
         {
-            if (ko.utils.unwrapObservable((typeof (observable) == "function") ? observable() : observable))
+            if (value)
             {
                 $(element).hide(); 
 
