@@ -13,6 +13,7 @@ var koAnimate =
             easing: 'ease-in',
             easingOut: 'ease-out'
         },
+        
         hoverRotate:
         {
             degrees: 30,
@@ -22,13 +23,17 @@ var koAnimate =
             easing: 'ease-in',
             easingOut: 'ease-out'
         },
+        
         fadeVisible:
         {
             duration: 500,
             durationOut: 500,
             easing: 'ease-in',
-            easingOut: 'ease-out'
+            easingOut: 'ease-out',
+            delay: 50,
+            delayOut: 0
         },
+        
         scaleVisible:
         {
             scale: 1.0,
@@ -37,8 +42,11 @@ var koAnimate =
             duration: 500,
             durationOut: 500,
             easing: 'ease-in',
-            easingOut: 'ease-out'
+            easingOut: 'ease-out',
+            delay: 50,
+            delayOut: 0
         },
+        
         slideVisible:
         {
             duration: 500,
@@ -46,8 +54,11 @@ var koAnimate =
             direction: 'left',
             directionOut: 'left',
             easing: 'ease-in',
-            easingOut: 'ease-out'
+            easingOut: 'ease-out',
+            delay: 50,
+            delayOut: 50
         },
+        
         cssAnimate:
         {
             animation: 'tada',
@@ -55,14 +66,15 @@ var koAnimate =
             duration: 1000,
             callback: null
         },
+        
         cssAnimateVisible:
         {
             animation: 'bounceIn',
             animationOut: 'bounceOut',
             duration: 1000,
             durationOut: 1000,
-            delay: 0,
-            delayOut: 0
+            delay: 1,
+            delayOut: 1
         }
         
     }
@@ -77,41 +89,6 @@ var koAnimate =
 koAnimate.helpers =
 {
     cssVendors: ['-webkit-', '-moz-', '-o-,', '-ms-', ''],
-
-    getValue: function(json, property, defaultValue, requiresJson, isObservable)
-    {
-        if (isObservable)
-        {
-            return typeof json()[property] != "undefined" ? json()[property] : json();
-        }
-        
-        if (!json())
-        {
-             return defaultValue;
-        }
-        
-        if (json()[property])
-        {
-             return json()[property];
-        }
-        
-        if (requiresJson)
-        {
-             return defaultValue;
-        }
-        
-        if (!isNaN(parseFloat(json())) && isFinite(json()))
-        {
-            return json();
-        }
-
-        if (typeof json() == "string")
-        {
-            return json();
-        }
-
-        return defaultValue;
-    },
 
     getDirectionX: function(direction)
     {
@@ -296,6 +273,8 @@ ko.bindingHandlers.fadeVisible =
         var durationOut = allBindings['has']('durationOut') ? allBindings.get('durationOut') : koAnimate.defaults.fadeVisible.durationOut;
         var easing = allBindings['has']('easing') ? allBindings.get('easing') : koAnimate.defaults.fadeVisible.easing;
         var easingOut = allBindings['has']('easingOut') ? allBindings.get('easingOut') : koAnimate.defaults.fadeVisible.easingOut;
+        var delay = allBindings['has']('delay') ? allBindings.get('delay') : koAnimate.defaults.fadeVisible.delay;
+        var delayOut = allBindings['has']('delayOut') ? allBindings.get('delayOut') : koAnimate.defaults.fadeVisible.delayOut;
         
         $(element).off(koAnimate.animations.transitionEnd);
         clearTimeout(element.koAnimateFadeVisible);
@@ -313,19 +292,22 @@ ko.bindingHandlers.fadeVisible =
                     $(element).show();
                 });
                 
-            }, 50);
+            }, delay);
 
         }
         else
         {
-            $(element).show();
-            
-            koAnimate.animations.opacity(element, 0, durationOut, easingOut);
-            
-            $(element).on(koAnimate.animations.transitionEnd, function ()
+            setTimeout(function()
             {
-                $(element).hide();
-            });
+                $(element).show();
+            
+                koAnimate.animations.opacity(element, 0, durationOut, easingOut);
+            
+                $(element).on(koAnimate.animations.transitionEnd, function ()
+                {
+                    $(element).hide();
+                });
+            }, delayOut);
         }
     }
 };
@@ -353,7 +335,9 @@ ko.bindingHandlers.scaleVisible =
         var scale = allBindings['has']('scale') ? allBindings.get('scale') : koAnimate.defaults.scaleVisible.scale;
         var scaleHide = allBindings['has']('scaleHide') ? allBindings.get('scaleHide') : koAnimate.defaults.scaleVisible.scaleHide;
         var scaleHideOut = allBindings['has']('scaleHideOut') ? allBindings.get('scaleHideOut') : koAnimate.defaults.scaleVisible.scaleHideOut;
-
+        var delay = allBindings['has']('delay') ? allBindings.get('delay') : koAnimate.defaults.scaleVisible.delay;
+        var delayOut = allBindings['has']('delayOut') ? allBindings.get('delayOut') : koAnimate.defaults.scaleVisible.delayOut;
+        
         $(element).off(koAnimate.animations.transitionEnd);
         clearTimeout(element.koAnimateScaleVisible);
 
@@ -374,16 +358,20 @@ ko.bindingHandlers.scaleVisible =
                 });
 
 
-            }, 50);
+            }, delay);
         }
         else
         {
-            koAnimate.animations.scale(element, scaleHideOut, durationOut, easingOut);
-
-            $(element).on(koAnimate.animations.transitionEnd, function ()
+            setTimeout(function()
             {
-                $(element).hide();
-            });
+
+                koAnimate.animations.scale(element, scaleHideOut, durationOut, easingOut);
+
+                $(element).on(koAnimate.animations.transitionEnd, function()
+                {
+                    $(element).hide();
+                });
+            }, delayOut);
         }
 
     }
@@ -411,7 +399,9 @@ ko.bindingHandlers.slideVisible =
         var easing = allBindings['has']('easing') ? allBindings.get('easing') : koAnimate.defaults.slideVisible.easing;
         var easingOut = allBindings['has']('easingOut') ? allBindings.get('easingOut') : koAnimate.defaults.slideVisible.easingOut;
         var directionOut = allBindings['has']('directionOut') ? allBindings.get('directionOut') : koAnimate.defaults.slideVisible.directionOut;
-
+        var delay = allBindings['has']('delay') ? allBindings.get('delay') : koAnimate.defaults.slideVisible.delay;
+        var delayOut = allBindings['has']('delayOut') ? allBindings.get('delayOut') : koAnimate.defaults.slideVisible.delayOut;
+        
         $(element).off(koAnimate.animations.transitionEnd);
         clearTimeout(element.koAnimateSlideVisible);
         clearTimeout(element.koAnimateSlideVisible2);
@@ -425,7 +415,7 @@ ko.bindingHandlers.slideVisible =
                 element.koAnimateSlideVisible2 = setTimeout(function ()
                 {
                     koAnimate.animations.slide(element, '0px', '0px', duration, easing);
-                }, 50);
+                }, delay);
             }
             else
             {
@@ -438,7 +428,7 @@ ko.bindingHandlers.slideVisible =
                         $(element).hide();
                     });
 
-                }, 50);
+                }, delayOut);
 
             }
 
@@ -532,7 +522,7 @@ ko.bindingHandlers.cssAnimateVisible =
                         $(element).removeClass("animated " + animation);
                         koAnimate.animations.removeDuration(element);
                     });
-                }, 1);
+                }, delay);
 
             }
             else if ($(element).is(':visible') && value === false)
@@ -549,11 +539,11 @@ ko.bindingHandlers.cssAnimateVisible =
                         koAnimate.animations.removeDuration(element);
                         $(element).hide();
                     });
-                }, 1);
+                }, delayOut);
             }
 
 
-        }, delay);
+        }, 1);
 
 
         
