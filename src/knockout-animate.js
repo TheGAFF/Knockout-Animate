@@ -10,6 +10,7 @@ var koAnimate =
             duration: 250,
             scaleOut: 1.0,
             durationOut: 100,
+            durationFinal: 100,
             easing: 'ease-in',
             easingOut: 'ease-out'
         },
@@ -75,6 +76,16 @@ var koAnimate =
             durationOut: 1000,
             delay: 1,
             delayOut: 1
+        },
+
+
+        cssAnimateReveal:
+        {
+            animation: 'bounceIn',
+            duration: 1000,
+            offset: 0,
+            callback: null,
+            delay: 1
         }
         
     }
@@ -114,7 +125,20 @@ koAnimate.helpers =
             default:
                 return '0px';
         }
+    },
+
+    isElementInViewport: function(element, offset)
+    {
+        var rectangle = element.getBoundingClientRect();
+
+        return (
+            rectangle.top >= 0 &&
+            rectangle.left >= 0 &&
+            rectangle.bottom <= ((window.innerHeight || document.documentElement.clientHeight) - offset) &&
+            rectangle.right <= (window.innerWidth || document.documentElement.clientWidth) 
+        );
     }
+
 };
 
 //#endregion "Helpers"
@@ -123,9 +147,11 @@ koAnimate.helpers =
 
 koAnimate.animations =
 {
-    animationEnd: 'animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd',
+    animationEnd: 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend',
     
     transitionEnd: 'transitionend webkitTransitionEnd oTransitionEnd otransitionend',
+    
+    animationInitializationName: 'ko-animate-initialization',
     
     setDuration: function (element, duration)
     {
@@ -192,7 +218,30 @@ koAnimate.animations =
         {
             $(element).css(item + 'transform', 'translate(' + pixelsX + ',' + pixelsY + ')').css(item + 'transition', seconds + 's ' + easing);
         });
+    },
+
+    cssAnimateReveal: function (element, animation, offset, delay, duration, callback) {
+
+        if (koAnimate.helpers.isElementInViewport($(element)[0], offset) && !$(element).hasClass("animated")) {
+            
+            setTimeout(function () {
+                element.style.visibility = "";
+                koAnimate.animations.setDuration(element, duration);
+                $(element).addClass("animated " + animation);
+
+                $(element).one(koAnimate.animations.animationEnd, function () {
+                    if (callback) {
+                        callback();
+                    }
+
+                    $(window).off("scroll", element.koAnimateScrollHandler);
+                });
+
+            }, delay);
+        }
     }
+
+
 };
 
 //#endregion "Animations"
@@ -339,6 +388,7 @@ ko.bindingHandlers.scaleVisible =
         var delayOut = allBindings['has']('delayOut') ? allBindings.get('delayOut') : koAnimate.defaults.scaleVisible.delayOut;
         
         $(element).off(koAnimate.animations.transitionEnd);
+        
         clearTimeout(element.koAnimateScaleVisible);
 
         if (ko.utils.unwrapObservable(valueAccessor()))
@@ -457,7 +507,7 @@ ko.bindingHandlers.cssAnimate =
 
             $(element).addClass("animated " + animation);
 
-            $(element).bind(koAnimate.animations.animationEnd, function ()
+            $(element).one(koAnimate.animations.animationEnd, function ()
             {
                 $(element).removeClass("animated " + animation);
                 koAnimate.animations.removeDuration(element);
@@ -497,13 +547,15 @@ ko.bindingHandlers.cssAnimateVisible =
         var animationOut = allBindings['has']('animationOut') ? allBindings.get('animationOut') : koAnimate.defaults.cssAnimateVisible.animationOut;
         var delay = allBindings['has']('delay') ? allBindings.get('delay') : koAnimate.defaults.cssAnimateVisible.delay;
         var delayOut = allBindings['has']('delayOut') ? allBindings.get('delayOut') : koAnimate.defaults.cssAnimateVisible.delayOut;
+
         var value = ko.utils.unwrapObservable(valueAccessor());
+        var isCurrentlyVisible = !(element.style.display == "none");
 
 
-        $(element).unbind(koAnimate.animations.animationEnd);
+        $(element).off(koAnimate.animations.animationEnd);
         $(element).removeClass(animation);
         $(element).removeClass(animationOut);
-        
+
         setTimeout(function()
         {
             if (value)
@@ -517,7 +569,7 @@ ko.bindingHandlers.cssAnimateVisible =
                     $(element).show();
                     $(element).addClass("animated " + animation);
 
-                    $(element).bind(koAnimate.animations.animationEnd, function ()
+                    $(element).on(koAnimate.animations.animationEnd, function ()
                     {
                         $(element).removeClass("animated " + animation);
                         koAnimate.animations.removeDuration(element);
@@ -533,7 +585,7 @@ ko.bindingHandlers.cssAnimateVisible =
                 {
                     $(element).addClass("animated " + animationOut);
 
-                    $(element).bind(koAnimate.animations.animationEnd, function ()
+                    $(element).on(koAnimate.animations.animationEnd, function ()
                     {
                         $(element).removeClass("animated " + animationOut);
                         koAnimate.animations.removeDuration(element);
@@ -544,12 +596,36 @@ ko.bindingHandlers.cssAnimateVisible =
 
 
         }, 1);
-
-
-        
-
     }
 };
 
+ko.bindingHandlers.cssAnimateReveal =
+{
+    init: function (element, valueAccessor, allBindings)
+    {
+        var callback = allBindings['has']('callback') ? allBindings.get('callback') : koAnimate.defaults.cssAnimateReveal.callback;
+        var duration = allBindings['has']('duration') ? allBindings.get('duration') : koAnimate.defaults.cssAnimateReveal.duration;
+        var offset = allBindings['has']('offset') ? allBindings.get('offset') : koAnimate.defaults.cssAnimateReveal.offset;
+        var delay = allBindings['has']('delay') ? allBindings.get('delay') : koAnimate.defaults.cssAnimateReveal.delay;
+        var animation = valueAccessor() || koAnimate.defaults.cssAnimateReveal.animation;
+
+        element.style.visibility = "hidden";
+
+        element.koAnimateScrollTimeout = null;
+
+       element.koAnimateScrollHandler = $(window).scroll(function ()
+       {
+           if (element.koAnimateScrollTimeout) {
+
+               clearTimeout(element.koAnimateScrollTimeout);
+               element.koAnimateScrollTimeout = null;
+           }
+
+           element.koAnimateScrollTimeout = setTimeout(koAnimate.animations.cssAnimateReveal(element, animation, offset, delay, duration, callback), 60);
+
+        });
+    }
+};
 
 //#endregion "Animate.CSS
+
