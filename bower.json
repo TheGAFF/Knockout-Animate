@@ -1,0 +1,23 @@
+{
+  "name": "Knockout-Animate",
+  "version": "1.0.0",
+  "homepage": "https://github.com/TheGAFF/Knockout-Animate",
+  "authors": [
+    "John Gafford <john@johngafford.com>"
+  ],
+  "description": "A small collection of knockout.js binding handlers that allows you to quickly enhance your website or web application with subtle CSS3 animations. This library is great for showing/hiding things in a fancy way.",
+  "main": "src/knockout-animate.js",
+  "keywords": [
+    "knockout",
+    "css3",
+    "animation"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
