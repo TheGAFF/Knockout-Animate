@@ -10,7 +10,7 @@
   },
   "_source": "https://github.com/TheGAFF/Knockout-Animate.git",
   "_target": "master",
-  "_originalSource": "https://github.com/googlemaps/js-rich-marker.git",
+  "_originalSource": "https://github.com/TheGAFF/Knockout-Animate.git",
   "_direct": true,
 	"main": [
 		"src/knockout-animate.js"
